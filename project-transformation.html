@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blink Experience - Project Management Transformation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        
+        .toggle-switch {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .toggle-option {
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .toggle-option.active {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .comparison-side {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.5s ease;
+        }
+        
+        .side-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .side-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .before-title {
+            color: #FF6B6B;
+        }
+        
+        .after-title {
+            color: #4ECDC4;
+        }
+        
+        .side-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+        
+        .process-steps {
+            list-style: none;
+        }
+        
+        .process-step {
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .process-step:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .before-step {
+            border-left-color: #FF6B6B;
+        }
+        
+        .after-step {
+            border-left-color: #4ECDC4;
+        }
+        
+        .step-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .step-title {
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .step-time {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .step-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .metrics-section {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .metrics-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .metric-title {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .metric-comparison {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .metric-before {
+            color: #FF6B6B;
+            font-weight: bold;
+        }
+        
+        .metric-after {
+            color: #4ECDC4;
+            font-weight: bold;
+        }
+        
+        .metric-improvement {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .example-event {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+        }
+        
+        .example-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+        }
+        
+        .example-details {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .example-title {
+            color: #FFD700;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .example-specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .spec-item {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .timeline-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .timeline-side {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .before-timeline {
+            color: #FF6B6B;
+        }
+        
+        .after-timeline {
+            color: #4ECDC4;
+        }
+        
+        .timeline-item {
+            padding: 8px 0;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+/* Updated Navigation Menu Styles - Replace previous navigation CSS */
+.nav-menu {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 10px 15px;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: calc(100% - 40px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.nav-menu a:hover {
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.nav-menu a.active {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #1a1a2e;
+    transform: translateY(-2px);
+}
+
+/* Remove hamburger menu - not needed with bottom nav */
+.nav-toggle {
+    display: none;
+}
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+    .nav-menu {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        padding: 8px 10px;
+        gap: 5px;
+        max-width: none;
+    }
+    
+    .nav-menu a {
+        font-size: 0.7rem;
+        padding: 6px 8px;
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+/* Alternative: Top Header Navigation (if you prefer top position) */
+.nav-header {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-header .nav-menu {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    max-width: 100%;
+}
+    </style>
+</head>
+<body>
+<!-- Top Header Navigation - Add after <body> tag -->
+<div class="nav-header">
+    <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">🏠 Dashboard</a>
+        <a href="executive-strategy.html" class="nav-link">📊 Strategy</a>
+        <a href="compliance-automation.html" class="nav-link">✅ Compliance</a>
+        <a href="financial-dashboard.html" class="nav-link">💰 Finance</a>
+        <a href="vendor-management.html" class="nav-link">🛒 Procurement</a>
+        <a href="resource-management.html" class="nav-link">👥 HR</a>
+        <a href="project-transformation.html" class="nav-link">📋 Projects</a>
+        <a href="ai-event-planning.html" class="nav-link">🤖 AI</a>
+        <a href="roi-timeline.html" class="nav-link">📈 ROI</a>
+    </nav>
+</div>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Project Management Transformation</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">See how D365 revolutionizes event project delivery for Blink Experience</p>
+        </div>
+        
+        <div class="toggle-container">
+            <div class="toggle-switch">
+                <div class="toggle-option active" onclick="showComparison('overview')">📋 Overview</div>
+                <div class="toggle-option" onclick="showComparison('timeline')">⏱️ Timeline</div>
+                <div class="toggle-option" onclick="showComparison('example')">🎯 Live Example</div>
+            </div>
+        </div>
+        
+        <div id="overview-section">
+            <div class="comparison-container">
+                <div class="comparison-side">
+                    <div class="side-header">
+                        <div class="side-title before-title">
+                            😰 Current JD Edwards Process
+                        </div>
+                        <div class="side-subtitle">Manual, Time-Consuming, Error-Prone</div>
+                    </div>
+                    
+                    <ul class="process-steps">
+                        <li class="process-step before-step">
+                            <div class="step-header">
+                                <div class="step-title">Manual Project Setup</div>
+                                <div class="step-time">6 hours</div>
+                            </div>
+                            <div class="step-description">Manual creation of work breakdown structure, resource allocation, and budget setup across multiple systems</div>
+                        </li>
+                        
+                        <li class="process-step before-step">
+                            <div class="step-header">
+                                <div class="step-title">Vendor Coordination</div>
+                                <div class="step-time">15 hours/week</div>
+                            </div>
+                            <div class="step-description">WhatsApp groups, email chains, manual document collection, and phone calls for vendor management</div>
+                        </li>
+                        
+                        <li class="process-step before-step">
+                            <div class="step-header">
+                                <div class="step-title">Resource Planning</div>
+                                <div class="step-time">8 hours</div>
+                            </div>
+                            <div class="step-description">Manual availability checking, Excel spreadsheets, double-booking conflicts, last-minute replacements</div>
+                        </li>
+                        
+                        <li class="process-step before-step">
+                            <div class="step-header">
+                                <div class="step-title">Budget Tracking</div>
+                                <div class="step-time">Daily manual work</div>
+                            </div>
+                            <div class="step-description">Manual cost entry, 2-3 day delayed visibility, frequent budget overruns of 12-15%</div>
+                        </li>
+                        
+                        <li class="process-step before-step">
+                            <div class="step-header">
+                                <div class="step-title">Progress Reporting</div>
+                                <div class="step-time">4 hours weekly</div>
+                            </div>
+                            <div class="step-description">Manual report compilation, outdated data, client meetings to explain delays and issues</div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="comparison-side">
+                    <div class="side-header">
+                        <div class="side-title after-title">
+                            🚀 D365 Automated Process
+                        </div>
+                        <div class="side-subtitle">Intelligent, Fast, Accurate</div>
+                    </div>
+                    
+                    <ul class="process-steps">
+                        <li class="process-step after-step">
+                            <div class="step-header">
+                                <div class="step-title">AI Project Template</div>
+                                <div class="step-time">45 minutes</div>
+                            </div>
+                            <div class="step-description">AI-generated project templates based on event type, automatic resource allocation, integrated budget planning</div>
+                        </li>
+                        
+                        <li class="process-step after-step">
+                            <div class="step-header">
+                                <div class="step-title">Vendor Portal</div>
+                                <div class="step-time">2 hours/week</div>
+                            </div>
+                            <div class="step-description">Self-service vendor portal, automated document collection, real-time collaboration, AI vendor matching</div>
+                        </li>
+                        
+                        <li class="process-step after-step">
+                            <div class="step-header">
+                                <div class="step-title">Smart Resource Allocation</div>
+                                <div class="step-time">1.5 hours</div>
+                            </div>
+                            <div class="step-description">AI-powered resource matching, real-time availability, conflict prevention, automated backup planning</div>
+                        </li>
+                        
+                        <li class="process-step after-step">
+                            <div class="step-header">
+                                <div class="step-title">Real-time Cost Control</div>
+                                <div class="step-time">Automated</div>
+                            </div>
+                            <div class="step-description">Live budget tracking, automated alerts, predictive overrun warnings, 3-5% average variance</div>
+                        </li>
+                        
+                        <li class="process-step after-step">
+                            <div class="step-header">
+                                <div class="step-title">Live Dashboards</div>
+                                <div class="step-time">Real-time</div>
+                            </div>
+                            <div class="step-description">Automated progress tracking, client self-service portal, predictive analytics, proactive issue resolution</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="metrics-section">
+                <div class="metrics-header">
+                    <h2>📈 Quantified Improvements</h2>
+                </div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">⚡</div>
+                        <div class="metric-title">Project Setup Time</div>
+                        <div class="metric-comparison">
+                            <span class="metric-before">6 hours</span>
+                            <span>→</span>
+                            <span class="metric-after">45 mins</span>
+                        </div>
+                        <div class="metric-improvement">88% Faster</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">👥</div>
+                        <div class="metric-title">Resource Conflicts</div>
+                        <div class="metric-comparison">
+                            <span class="metric-before">25%</span>
+                            <span>→</span>
+                            <span class="metric-after">5%</span>
+                        </div>
+                        <div class="metric-improvement">80% Reduction</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">💰</div>
+                        <div class="metric-title">Budget Overruns</div>
+                        <div class="metric-comparison">
+                            <span class="metric-before">12-15%</span>
+                            <span>→</span>
+                            <span class="metric-after">3-5%</span>
+                        </div>
+                        <div class="metric-improvement">70% Better Control</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-title">Reporting Time</div>
+                        <div class="metric-comparison">
+                            <span class="metric-before">4 hrs/week</span>
+                            <span>→</span>
+                            <span class="metric-after">Real-time</span>
+                        </div>
+                        <div class="metric-improvement">100% Automated</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">😊</div>
+                        <div class="metric-title">Client Satisfaction</div>
+                        <div class="metric-comparison">
+                            <span class="metric-before">4.2/5</span>
+                            <span>→</span>
+                            <span class="metric-after">4.8/5</span>
+                        </div>
+                        <div class="metric-improvement">30% Higher</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">💵</div>
+                        <div class="metric-title">Project Margins</div>
+                        <div class="metric-comparison">
+                            <span class="metric-before">18%</span>
+                            <span>→</span>
+                            <span class="metric-after">22.5%</span>
+                        </div>
+                        <div class="metric-improvement">25% Improvement</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="timeline-section" style="display: none;">
+            <div class="example-event">
+                <div class="example-header">
+                    <h2>⏱️ Project Timeline Comparison</h2>
+                    <p style="color: rgba(255, 255, 255, 0.8);">Emirates NBD Leadership Summit - 500 Attendees</p>
+                </div>
+                
+                <div class="timeline-comparison">
+                    <div class="timeline-side">
+                        <div class="timeline-title before-timeline">😰 Current Process (6 weeks)</div>
+                        <div class="timeline-item"><strong>Week 1-2:</strong> Manual venue search, vendor identification</div>
+                        <div class="timeline-item"><strong>Week 2-3:</strong> Individual vendor negotiations, contract creation</div>
+                        <div class="timeline-item"><strong>Week 3-4:</strong> Resource allocation conflicts, manual scheduling</div>
+                        <div class="timeline-item"><strong>Week 4-5:</strong> Budget compilation, approval delays</div>
+                        <div class="timeline-item"><strong>Week 5-6:</strong> Final preparations, last-minute issues</div>
+                        <div class="timeline-item"><strong>Execution:</strong> Reactive problem solving, manual coordination</div>
+                    </div>
+                    
+                    <div class="timeline-side">
+                        <div class="timeline-title after-timeline">🚀 D365 Process (2.5 weeks)</div>
+                        <div class="timeline-item"><strong>Day 1-2:</strong> AI venue optimization, automated vendor matching</div>
+                        <div class="timeline-item"><strong>Week 1:</strong> Vendor portal negotiations, auto-contract generation</div>
+                        <div class="timeline-item"><strong>Week 2:</strong> AI resource allocation, conflict prevention</div>
+                        <div class="timeline-item"><strong>Week 2.5:</strong> Real-time budget approval, automated prep</div>
+                        <div class="timeline-item"><strong>Week 3:</strong> Predictive issue resolution, final optimization</div>
+                        <div class="timeline-item"><strong>Execution:</strong> AI-guided coordination, proactive management</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="example-section" style="display: none;">
+            <div class="example-event">
+                <div class="example-header">
+                    <h2>🎯 Live Example: Fortune 500 Corporate Gala</h2>
+                    <p style="color: rgba(255, 255, 255, 0.8);">Real-time D365 project management in action</p>
+                </div>
+                
+                <div class="example-details">
+                    <div class="example-title">🏢 Global Tech Company Annual Gala</div>
+                    
+                    <div class="example-specs">
+                        <div class="spec-item"><strong>1,200 Attendees</strong><br>International executives</div>
+                        <div class="spec-item"><strong>AED 950K Budget</strong><br>Multi-category tracking</div>
+                        <div class="spec-item"><strong>35 Vendors</strong><br>Premium suppliers</div>
+                        <div class="spec-item"><strong>Dubai Marina</strong><br>Waterfront venue</div>
+                        <div class="spec-item"><strong>3-Day Event</strong><br>Conference + gala</div>
+                        <div class="spec-item"><strong>VIP Program</strong><br>C-suite attendees</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-comparison">
+                    <div class="timeline-side">
+                        <div class="timeline-title before-timeline">😰 Traditional Approach</div>
+                        <div class="timeline-item">⏰ 8 weeks planning time</div>
+                        <div class="timeline-item">📞 200+ coordination calls</div>
+                        <div class="timeline-item">💸 15% budget overrun (AED 142K)</div>
+                        <div class="timeline-item">🚨 4 major issues during event</div>
+                        <div class="timeline-item">😟 Client satisfaction: 4.1/5</div>
+                        <div class="timeline-item">📊 Post-event report: 1 week delay</div>
+                    </div>
+                    
+                    <div class="timeline-side">
+                        <div class="timeline-title after-timeline">🚀 D365 Powered Delivery</div>
+                        <div class="timeline-item">⚡ 3 weeks planning time</div>
+                        <div class="timeline-item">🤖 90% automated coordination</div>
+                        <div class="timeline-item">💰 3% under budget (AED 28K saved)</div>
+                        <div class="timeline-item">✅ Zero major issues (predicted & prevented)</div>
+                        <div class="timeline-item">😍 Client satisfaction: 4.9/5</div>
+                        <div class="timeline-item">📈 Real-time analytics throughout</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 15px;">
+                    <h3 style="color: #FFD700; margin-bottom: 15px;">🎯 Bottom Line Impact</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="color: #4ECDC4; font-weight: bold;">AED 170K Additional Profit</div>
+                        <div style="color: #4ECDC4; font-weight: bold;">62% Faster Delivery</div>
+                        <div style="color: #4ECDC4; font-weight: bold;">95% Process Automation</div>
+                        <div style="color: #4ECDC4; font-weight: bold;">Zero Quality Issues</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showComparison(section) {
+            // Hide all sections
+            document.getElementById('overview-section').style.display = 'none';
+            document.getElementById('timeline-section').style.display = 'none';
+            document.getElementById('example-section').style.display = 'none';
+            
+            // Show selected section
+            document.getElementById(section + '-section').style.display = 'block';
+            
+            // Update toggle buttons
+            document.querySelectorAll('.toggle-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+        }
+        
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const processSteps = document.querySelectorAll('.process-step');
+            
+            processSteps.forEach((step, index) => {
+                setTimeout(() => {
+                    step.style.opacity = '0';
+                    step.style.transform = 'translateX(-20px)';
+                    step.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        step.style.opacity = '1';
+                        step.style.transform = 'translateX(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

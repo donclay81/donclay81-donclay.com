@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta viewport="width=device-width, initial-scale=1.0">
+    <title>Blink Experience - Compliance Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #00ff88, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .compliance-status {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(34, 197, 94, 0.2);
+            border: 2px solid rgba(34, 197, 94, 0.4);
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: #22C55E;
+            font-weight: 600;
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
+            to { box-shadow: 0 0 20px rgba(34, 197, 94, 0.8); }
+        }
+        
+        .status-icon {
+            width: 12px;
+            height: 12px;
+            background: #22C55E;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .overview-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ff88, #00d4ff);
+        }
+        
+        .overview-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+        
+        .compliance-score {
+            background: linear-gradient(45deg, #22C55E, #16A34A);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00ff88;
+            margin-bottom: 8px;
+        }
+        
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .jurisdictions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .jurisdiction-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .jurisdiction-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: scale(1.02);
+        }
+        
+        .jurisdiction-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .flag-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+        
+        .jurisdiction-info {
+            flex: 1;
+        }
+        
+        .jurisdiction-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+        }
+        
+        .jurisdiction-status {
+            background: linear-gradient(45deg, #22C55E, #16A34A);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .compliance-items {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .compliance-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .compliance-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .item-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .item-icon {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .item-name {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+        
+        .item-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-compliant {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22C55E;
+        }
+        
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+        }
+        
+        .status-warning {
+            background: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+        }
+        
+        .automation-showcase {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .showcase-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .automation-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .automation-side {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .side-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .before-title { 
+            color: #EF4444;
+            border-bottom: 2px solid #EF4444;
+            padding-bottom: 10px;
+        }
+        
+        .after-title { 
+            color: #22C55E;
+            border-bottom: 2px solid #22C55E;
+            padding-bottom: 10px;
+        }
+        
+        .process-list {
+            list-style: none;
+        }
+        
+        .process-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .process-icon {
+            margin-right: 12px;
+            margin-top: 2px;
+            font-size: 1.2rem;
+        }
+        
+        .process-content {
+            flex: 1;
+        }
+        
+        .process-title {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        .process-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        .process-time {
+            color: #FFD700;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+        
+        .savings-summary {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .savings-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .savings-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .savings-metric {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .savings-metric:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+        
+        .alerts-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+        }
+        
+        .alerts-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .alerts-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+            margin-left: 10px;
+        }
+        
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-left-color: #22C55E;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3B82F6;
+        }
+        
+        .alert-content {
+            flex: 1;
+            margin-left: 10px;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: white;
+        }
+        
+        .alert-description {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+        
+        .demo-controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .demo-btn {
+            background: linear-gradient(45deg, #00ff88, #00d4ff);
+            color: #1a1a2e;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+        }
+        
+        @media (max-width: 1024px) {
+            .automation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .jurisdictions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+/* Updated Navigation Menu Styles - Replace previous navigation CSS */
+.nav-menu {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 10px 15px;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: calc(100% - 40px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.nav-menu a:hover {
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.nav-menu a.active {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #1a1a2e;
+    transform: translateY(-2px);
+}
+
+/* Remove hamburger menu - not needed with bottom nav */
+.nav-toggle {
+    display: none;
+}
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+    .nav-menu {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        padding: 8px 10px;
+        gap: 5px;
+        max-width: none;
+    }
+    
+    .nav-menu a {
+        font-size: 0.7rem;
+        padding: 6px 8px;
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+/* Alternative: Top Header Navigation (if you prefer top position) */
+.nav-header {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-header .nav-menu {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    max-width: 100%;
+}
+    </style>
+</head>
+<body>
+<!-- Top Header Navigation - Add after <body> tag -->
+<div class="nav-header">
+    <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">🏠 Dashboard</a>
+        <a href="executive-strategy.html" class="nav-link">📊 Strategy</a>
+        <a href="compliance-automation.html" class="nav-link">✅ Compliance</a>
+        <a href="financial-dashboard.html" class="nav-link">💰 Finance</a>
+        <a href="vendor-management.html" class="nav-link">🛒 Procurement</a>
+        <a href="resource-management.html" class="nav-link">👥 HR</a>
+        <a href="project-transformation.html" class="nav-link">📋 Projects</a>
+        <a href="ai-event-planning.html" class="nav-link">🤖 AI</a>
+        <a href="roi-timeline.html" class="nav-link">📈 ROI</a>
+    </nav>
+</div>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>✅ Multi-Jurisdictional Compliance Automation</h1>
+            <div class="compliance-status">
+                <div class="status-icon"></div>
+                98.5% Overall Compliance Score - All Jurisdictions Green
+            </div>
+            <p style="font-size: 1.2rem; opacity: 0.8;">From AED 165K annual compliance costs to AED 45K with 90% automation</p>
+        </div>
+        
+        <div class="overview-grid">
+            <div class="overview-card">
+                <div class="card-header">
+                    <div class="card-title">Automated Processes</div>
+                    <div class="compliance-score">90%</div>
+                </div>
+                <div class="card-value">27/30</div>
+                <div class="card-subtitle">Compliance tasks fully automated</div>
+            </div>
+            
+            <div class="overview-card">
+                <div class="card-header">
+                    <div class="card-title">Cost Reduction</div>
+                    <div class="compliance-score">73%</div>
+                </div>
+                <div class="card-value">AED 120K</div>
+                <div class="card-subtitle">Annual savings vs manual process</div>
+            </div>
+            
+            <div class="overview-card">
+                <div class="card-header">
+                    <div class="card-title">Risk Mitigation</div>
+                    <div class="compliance-score">95%</div>
+                </div>
+                <div class="card-value">Zero</div>
+                <div class="card-subtitle">Penalties in last 18 months</div>
+            </div>
+            
+            <div class="overview-card">
+                <div class="card-header">
+                    <div class="card-title">Processing Speed</div>
+                    <div class="compliance-score">85%</div>
+                </div>
+                <div class="card-value">75%</div>
+                <div class="card-subtitle">Faster compliance reporting</div>
+            </div>
+        </div>
+        
+        <div class="jurisdictions-grid">
+            <div class="jurisdiction-card">
+                <div class="jurisdiction-header">
+                    <div class="flag-icon">🇦🇪</div>
+                    <div class="jurisdiction-info">
+                        <div class="jurisdiction-name">United Arab Emirates</div>
+                        <div class="jurisdiction-status">100% Compliant</div>
+                    </div>
+                </div>
+                
+                <div class="compliance-items">
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">💰</div>
+                            <div class="item-name">VAT Returns (5%)</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ Filed</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Auto-submitted</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">🏦</div>
+                            <div class="item-name">WPS Compliance</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ 100%</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Automated</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">📋</div>
+                            <div class="item-name">Trade License</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ Valid</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Until Dec 2025</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">🔍</div>
+                            <div class="item-name">Economic Substance</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ Met</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Requirements</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="jurisdiction-card">
+                <div class="jurisdiction-header">
+                    <div class="flag-icon">🇸🇦</div>
+                    <div class="jurisdiction-info">
+                        <div class="jurisdiction-name">Kingdom of Saudi Arabia</div>
+                        <div class="jurisdiction-status">98% Compliant</div>
+                    </div>
+                </div>
+                
+                <div class="compliance-items">
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">📊</div>
+                            <div class="item-name">ZATCA E-Invoicing</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ 100%</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Automated</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">💰</div>
+                            <div class="item-name">VAT Returns (15%)</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ Filed</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">On time</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">🕌</div>
+                            <div class="item-name">Zakat Declaration</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ Filed</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Q1 2025</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">👥</div>
+                            <div class="item-name">Saudization (68%)</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ Exceeds</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Target: 60%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="jurisdiction-card">
+                <div class="jurisdiction-header">
+                    <div class="flag-icon">🇭🇺</div>
+                    <div class="jurisdiction-info">
+                        <div class="jurisdiction-name">Hungary</div>
+                        <div class="jurisdiction-status">96% Compliant</div>
+                    </div>
+                </div>
+                
+                <div class="compliance-items">
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">🇪🇺</div>
+                            <div class="item-name">EU VAT (27%)</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ Filed</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Automated</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">🏢</div>
+                            <div class="item-name">Corporate Tax (9%)</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ Applied</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Correctly</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">🔒</div>
+                            <div class="item-name">GDPR Compliance</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-compliant">✓ Full</div>
+                            <div style="color: #22C55E; font-size: 0.8rem;">Maintained</div>
+                        </div>
+                    </div>
+                    
+                    <div class="compliance-item">
+                        <div class="item-info">
+                            <div class="item-icon">👷</div>
+                            <div class="item-name">Social Contributions</div>
+                        </div>
+                        <div class="item-status">
+                            <div class="status-badge status-pending">⏳ Pending</div>
+                            <div style="color: #F59E0B; font-size: 0.8rem;">Due June 15</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="automation-showcase">
+            <div class="showcase-header">
+                <h2 class="showcase-title">🔄 Compliance Process Transformation</h2>
+                <p style="color: rgba(255, 255, 255, 0.8);">Manual vs Automated Compliance Management</p>
+            </div>
+            
+            <div class="automation-grid">
+                <div class="automation-side">
+                    <div class="side-title before-title">😰 Manual Process (Before)</div>
+                    
+                    <ul class="process-list">
+                        <li class="process-item">
+                            <div class="process-icon" style="color: #EF4444;">📋</div>
+                            <div class="process-content">
+                                <div class="process-title">Manual Data Collection</div>
+                                <div class="process-description">Gathering financial data from multiple systems, Excel exports, manual reconciliation</div>
+                                <div class="process-time">8-12 hours monthly per entity</div>
+                            </div>
+                        </li>
+                        
+                        <li class="process-item">
+                            <div class="process-icon" style="color: #EF4444;">🧮</div>
+                            <div class="process-content">
+                                <div class="process-title">VAT Calculations</div>
+                                <div class="process-description">Manual calculation of VAT across different rates (5%, 15%, 27%), error-prone process</div>
+                                <div class="process-time">15-20 hours per jurisdiction</div>
+                            </div>
+                        </li>
+                        
+                        <li class="process-item">
+                            <div class="process-icon" style="color: #EF4444;">📊</div>
+                            <div class="process-content">
+                                <div class="process-title">Report Preparation</div>
+                                <div class="process-description">Creating compliance reports, filing forms, external consultant dependency</div>
+                                <div class="process-time">AED 120K annually</div>
+                            </div>
+                        </li>
+                        
+                        <li class="process-item">
+                            <div class="process-icon" style="color: #EF4444;">⚠️</div>
+                            <div class="process-content">
+                                <div class="process-title">Risk Management</div>
+                                <div class="process-description">Reactive compliance, penalty risks, audit preparation stress</div>
+                                <div class="process-time">5-6 incidents yearly</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="automation-side">
+                    <div class="side-title after-title">🚀 Automated Process (After)</div>
+                    
+                    <ul class="process-list">
+                        <li class="process-item">
+                            <div class="process-icon" style="color: #22C55E;">⚡</div>
+                            <div class="process-content">
+                                <div class="process-title">Real-time Data Integration</div>
+                                <div class="process-description">Automatic data consolidation from all entities, live financial integration</div>
+                                <div class="process-time">Instant, 24/7 availability</div>
+                            </div>
+                        </li>
+                        
+                        <li class="process-item">
+                            <div class="process-icon" style="color: #22C55E;">🤖</div>
+                            <div class="process-content">
+                                <div class="process-title">AI-Powered Calculations</div>
+                                <div class="process-description">Automated VAT calculation with 99.8% accuracy, multi-jurisdiction rules engine</div>
+                                <div class="process-time">Real-time processing</div>
+                            </div>
+                        </li>
+                        
+                        <li class="process-item">
+                            <div class="process-icon" style="color: #22C55E;">📤</div>
+                            <div class="process-content">
+                                <div class="process-title">Auto-Submission</div>
+                                <div class="process-description">Direct integration with ZATCA, FTA, and Hungarian tax authorities</div>
+                                <div class="process-time">Zero manual intervention</div>
+                            </div>
+                        </li>
+                        
+                        <li class="process-item">
+                            <div class="process-icon" style="color: #22C55E;">🛡️</div>
+                            <div class="process-content">
+                                <div class="process-title">Proactive Monitoring</div>
+                                <div class="process-description">Predictive compliance alerts, automated audit trails, zero penalty risk</div>
+                                <div class="process-time">Continuous protection</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="savings-summary">
+            <div class="savings-header">
+                <h2 style="color: white; margin-bottom: 10px;">💰 Compliance Cost Savings</h2>
+                <p style="color: rgba(255, 255, 255, 0.8);">Annual financial impact of automation</p>
+            </div>
+            
+            <div class="savings-metrics">
+                <div class="savings-metric">
+                    <div class="metric-icon">💸</div>
+                    <div class="metric-value">AED 120K</div>
+                    <div class="metric-label">External Consultant Savings</div>
+                </div>
+                
+                <div class="savings-metric">
+                    <div class="metric-icon">⏱️</div>
+                    <div class="metric-value">85%</div>
+                    <div class="metric-label">Time Reduction</div>
+                </div>
+                
+                <div class="savings-metric">
+                    <div class="metric-icon">🚫</div>
+                    <div class="metric-value">AED 85K</div>
+                    <div class="metric-label">Penalty Avoidance</div>
+                </div>
+                
+                <div class="savings-metric">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-value">99.8%</div>
+                    <div class="metric-label">Accuracy Rate</div>
+                </div>
+                
+                <div class="savings-metric">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-value">75%</div>
+                    <div class="metric-label">Audit Prep Reduction</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alerts-section">
+            <div class="alerts-header">
+                <div style="font-size: 1.5rem;">🔔</div>
+                <div class="alerts-title">Live Compliance Monitoring</div>
+            </div>
+            
+            <div class="alert-item alert-success">
+                <div style="font-size: 1.2rem;">✅</div>
+                <div class="alert-content">
+                    <div class="alert-title">UAE VAT Return Submitted Successfully</div>
+                    <div class="alert-description">April 2025 VAT return auto-submitted to FTA. Total VAT: AED 62,450. Confirmation received within 2 minutes.</div>
+                </div>
+            </div>
+            
+            <div class="alert-item alert-info">
+                <div style="font-size: 1.2rem;">📅</div>
+                <div class="alert-content">
+                    <div class="alert-title">Upcoming Compliance Deadline</div>
+                    <div class="alert-description">Hungary social contributions due June 15, 2025. System has prepared submission automatically. Amount: €2,850.</div>
+                </div>
+            </div>
+            
+            <div class="alert-item alert-success">
+                <div style="font-size: 1.2rem;">🔄</div>
+                <div class="alert-content">
+                    <div class="alert-title">ZATCA Integration Updated</div>
+                    <div class="alert-description">Saudi e-invoicing system updated with latest regulatory changes. All invoice templates automatically updated for compliance.</div>
+                </div>
+            </div>
+            
+            <div class="alert-item alert-info">
+                <div style="font-size: 1.2rem;">📈</div>
+                <div class="alert-content">
+                    <div class="alert-title">Compliance Performance Report</div>
+                    <div class="alert-description">Q1 2025 compliance score: 98.5%. Cost savings vs manual process: AED 30K this quarter. Zero penalties or late filings.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-controls">
+            <button class="demo-btn" onclick="showComplianceReport()">📋 Generate Compliance Report</button>
+            <button class="demo-btn" onclick="showAutomationDetails()">🤖 View Automation Details</button>
+            <button class="demo-btn" onclick="showRiskAssessment()">⚠️ Risk Assessment</button>
+        </div>
+    </div>
+
+    <script>
+        function showComplianceReport() {
+            const reportData = `📋 **COMPREHENSIVE COMPLIANCE REPORT - Q1 2025**\n\n🎯 **Executive Summary:**\n• Overall Compliance Score: 98.5%\n• Zero penalties or late filings\n• AED 30K cost savings this quarter\n• 90% process automation achieved\n\n🇦🇪 **UAE Compliance Status:**\n• VAT Returns: ✅ 100% on-time (Auto-submitted)\n• WPS Compliance: ✅ 100% salary transfers\n• Economic Substance: ✅ All requirements met\n• Trade License: ✅ Valid until December 2025\n• Audit Readiness: ✅ Complete digital trail\n\n🇸🇦 **KSA Compliance Status:**\n• ZATCA E-Invoicing: ✅ 100% compliant (5,247 invoices)\n• VAT Returns: ✅ Filed on time (15% rate)\n• Zakat Declaration: ✅ Submitted Q1 2025\n• Saudization: ✅ 68% (Exceeds 60% requirement)\n• Commercial Registration: ✅ All documents current\n\n🇭🇺 **Hungary Compliance Status:**\n• EU VAT: ✅ Filed on time (27% rate)\n• Corporate Tax: ✅ 9% rate applied correctly\n• GDPR: ✅ Full compliance maintained\n• Local Accounting: ✅ Hungarian standards met\n• Social Contributions: ⏳ Prepared (Due June 15)\n\n💰 **Financial Impact:**\n• Compliance Costs: AED 11.25K (Down from AED 41.25K)\n• External Consultant Savings: AED 30K/quarter\n• Penalty Avoidance: AED 21K/quarter\n• Efficiency Gains: 240 hours saved\n\n🎯 **Key Achievements:**\n• 27/30 processes fully automated\n• 99.8% accuracy in tax calculations\n• Real-time compliance monitoring\n• Seamless multi-jurisdiction management\n\n🔮 **Q2 2025 Outlook:**\n• Target: 95% automation (3 additional processes)\n• Projected savings: AED 35K\n• New regulation updates: Auto-implemented\n• Risk assessment: Minimal`;
+            
+            showModal("📋 Q1 2025 Compliance Report", reportData);
+        }
+        
+        function showAutomationDetails() {
+            const automationData = `🤖 **COMPLIANCE AUTOMATION ARCHITECTURE**\n\n⚙️ **Core Automation Components:**\n\n**Data Integration Layer:**\n• Real-time financial data sync from all entities\n• Automatic currency conversion and consolidation\n• Multi-system integration (ERP, Banking, CRM)\n• 99.9% uptime with redundant connections\n\n**Tax Calculation Engine:**\n• AI-powered VAT calculation across jurisdictions\n• Real-time rate updates from tax authorities\n• Multi-currency transaction processing\n• Exception handling and audit trails\n\n**Regulatory Compliance Module:**\n• Direct API integration with tax authorities\n• Automatic form generation and submission\n• Regulatory change monitoring and implementation\n• Compliance calendar with automated reminders\n\n🎯 **Automation Benefits by Process:**\n\n**VAT Processing:**\n• Before: 15-20 hours manual calculation\n• After: Real-time automated processing\n• Accuracy: 99.8% (vs 92% manual)\n• Cost: AED 2,500/month saved\n\n**Filing and Submissions:**\n• Before: 2-3 days preparation + consultant fees\n• After: Automatic submission within hours\n• Reliability: 100% on-time filing record\n• Cost: AED 10K/month consultant savings\n\n**Audit Preparation:**\n• Before: 3-4 weeks intensive preparation\n• After: Always audit-ready with digital trails\n• Efficiency: 75% time reduction\n• Quality: Complete documentation automation\n\n**Risk Management:**\n• Before: Reactive compliance, penalty risks\n• After: Predictive monitoring, zero penalties\n• Prevention: 100% compliance violation prevention\n• Value: AED 85K annual penalty avoidance\n\n🔧 **Technical Implementation:**\n• Microsoft Power Platform integration\n• D365 native compliance modules\n• API connections to 8 regulatory systems\n• Machine learning for pattern recognition\n• Blockchain audit trails (planned Q3 2025)\n\n📊 **Performance Metrics:**\n• Process automation: 90% complete\n• Error reduction: 94% vs manual\n• Cost efficiency: 73% improvement\n• Staff satisfaction: 89% (less manual work)\n• Client confidence: 96% trust in compliance`;
+            
+            showModal("🤖 Automation Architecture Details", automationData);
+        }
+        
+        function showRiskAssessment() {
+            const riskData = `⚠️ **COMPREHENSIVE RISK ASSESSMENT**\n\n🎯 **Overall Risk Profile: LOW**\n• Risk Score: 12/100 (Excellent)\n• Trend: Decreasing (-15% vs last quarter)\n• Mitigation: 94% of risks automated away\n\n📊 **Risk Categories Analysis:**\n\n**Regulatory Compliance Risk: MINIMAL**\n• Current Risk Level: 2/10\n• Automated Monitoring: 27/30 requirements\n• Real-time Updates: All jurisdictions covered\n• Penalty Risk: Near zero (AED 0 in 18 months)\n\n**Financial Accuracy Risk: LOW**\n• Calculation Accuracy: 99.8%\n• Multi-currency Risk: Automated hedging\n• Reporting Errors: <0.2% (down from 8%)\n• Audit Trail: 100% complete\n\n**Operational Risk: LOW**\n• System Uptime: 99.9%\n• Process Failure Rate: <1%\n• Staff Dependency: Reduced 85%\n• Knowledge Risk: Documented processes\n\n**Technology Risk: MODERATE**\n• Single Points of Failure: 3 identified\n• Cybersecurity: Bank-grade encryption\n• Data Backup: Triple redundancy\n• Disaster Recovery: <4 hour RTO\n\n🚨 **Risk Mitigation Strategies:**\n\n**Immediate Actions:**\n• Backup system implementation for critical processes\n• Additional API connections for redundancy\n• Staff cross-training on manual overrides\n• Quarterly risk assessment reviews\n\n**Medium-term Enhancements:**\n• Blockchain audit trail implementation\n• AI-powered predictive risk modeling\n• Enhanced cybersecurity measures\n• Regional compliance expertise expansion\n\n**Long-term Strategic Initiatives:**\n• Zero-trust security architecture\n• Quantum-safe encryption preparation\n• Regulatory AI for proactive compliance\n• Regional hub redundancy planning\n\n💡 **Key Risk Indicators:**\n• Compliance Score Trend: ✅ Stable at 98%+\n• System Performance: ✅ All metrics green\n• Staff Competency: ✅ 100% certified\n• Regulatory Changes: ✅ Auto-implemented\n\n🎯 **Risk vs Reward Analysis:**\n• Risk Reduction: 88% vs manual processes\n• Cost Avoidance: AED 205K annually\n• Efficiency Gains: 240+ hours monthly\n• Strategic Value: Competitive compliance advantage\n\n**Recommendation: Continue current automation strategy with planned enhancements for Q3 2025.**`;
+            
+            showModal("⚠️ Risk Assessment Report", riskData);
+        }
+        
+        function showModal(title, content) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                border: 1px solid rgba(0, 255, 136, 0.3);
+                border-radius: 20px;
+                padding: 30px;
+                max-width: 800px;
+                max-height: 80vh;
+                overflow-y: auto;
+                color: white;
+                position: relative;
+            `;
+            
+            modalContent.innerHTML = `
+                <button onclick="this.closest('.modal').remove()" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 20px;
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 24px;
+                    cursor: pointer;
+                ">&times;</button>
+                <h2 style="margin-bottom: 20px; color: #00ff88;">${title}</h2>
+                <div style="white-space: pre-line; line-height: 1.6;">${content}</div>
+            `;
+            
+            modal.className = 'modal';
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        // Auto-refresh compliance status
+        setInterval(() => {
+            const statusElements = document.querySelectorAll('.status-icon');
+            statusElements.forEach(element => {
+                element.style.animation = 'none';
+                setTimeout(() => {
+                    element.style.animation = 'pulse 2s infinite';
+                }, 100);
+            });
+        }, 30000);
+        
+        // Animate overview cards on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.overview-card, .jurisdiction-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(30px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 150);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blink Experience - Resource Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .section-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-tab {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+        
+        .filter-tab.active,
+        .filter-tab:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            color: #FFD700;
+        }
+        
+        .freelancer-grid {
+            display: grid;
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .freelancer-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+        
+        .freelancer-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .available { border-left-color: #22C55E; }
+        .busy { border-left-color: #EF4444; }
+        .partial { border-left-color: #F59E0B; }
+        
+        .freelancer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .freelancer-name {
+            font-weight: 600;
+            color: white;
+        }
+        
+        .freelancer-rating {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .freelancer-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .detail-item {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .skill-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+        
+        .availability-status {
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-available {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22C55E;
+        }
+        
+        .status-busy {
+            background: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+        }
+        
+        .status-partial {
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+        }
+        
+        .project-assignments {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .assignment-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .assignment-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .assignment-title {
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .assignment-date {
+            color: #FFD700;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .assignment-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            font-size: 0.85rem;
+        }
+        
+        .assignment-resources {
+            margin-top: 10px;
+        }
+        
+        .resource-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .resource-chip {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .ai-recommendations {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .ai-badge {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+        
+        .ai-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .recommendation-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid;
+        }
+        
+        .rec-optimization { border-left-color: #4ECDC4; }
+        .rec-warning { border-left-color: #F59E0B; }
+        .rec-opportunity { border-left-color: #22C55E; }
+        
+        .rec-title {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .rec-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .capacity-overview {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 25px;
+        }
+        
+        .capacity-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .capacity-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .capacity-metric {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .capacity-percentage {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        
+        .capacity-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+        }
+        
+        .capacity-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .capacity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B6B, #4ECDC4);
+            border-radius: 4px;
+            transition: width 2s ease;
+        }
+        
+        .demo-controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .demo-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+/* Updated Navigation Menu Styles - Replace previous navigation CSS */
+.nav-menu {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 10px 15px;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: calc(100% - 40px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.nav-menu a:hover {
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.nav-menu a.active {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #1a1a2e;
+    transform: translateY(-2px);
+}
+
+/* Remove hamburger menu - not needed with bottom nav */
+.nav-toggle {
+    display: none;
+}
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+    .nav-menu {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        padding: 8px 10px;
+        gap: 5px;
+        max-width: none;
+    }
+    
+    .nav-menu a {
+        font-size: 0.7rem;
+        padding: 6px 8px;
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+/* Alternative: Top Header Navigation (if you prefer top position) */
+.nav-header {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-header .nav-menu {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    max-width: 100%;
+}
+    </style>
+</head>
+<body>
+<!-- Top Header Navigation - Add after <body> tag -->
+<div class="nav-header">
+    <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">🏠 Dashboard</a>
+        <a href="executive-strategy.html" class="nav-link">📊 Strategy</a>
+        <a href="compliance-automation.html" class="nav-link">✅ Compliance</a>
+        <a href="financial-dashboard.html" class="nav-link">💰 Finance</a>
+        <a href="vendor-management.html" class="nav-link">🛒 Procurement</a>
+        <a href="resource-management.html" class="nav-link">👥 HR</a>
+        <a href="project-transformation.html" class="nav-link">📋 Projects</a>
+        <a href="ai-event-planning.html" class="nav-link">🤖 AI</a>
+        <a href="roi-timeline.html" class="nav-link">📈 ROI</a>
+    </nav>
+</div>
+    <div class="container">
+        <div class="header">
+            <h1>👥 Smart Resource & Freelancer Management</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Transform 200+ freelancer chaos into intelligent resource optimization</p>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">247</div>
+                <div class="stat-label">Active Freelancers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">85%</div>
+                <div class="stat-label">Utilization Rate</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">92%</div>
+                <div class="stat-label">Match Accuracy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">12hrs</div>
+                <div class="stat-label">Weekly Coordination</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">5%</div>
+                <div class="stat-label">Conflict Rate</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">96%</div>
+                <div class="stat-label">Client Satisfaction</div>
+            </div>
+        </div>
+        
+        <div class="main-grid">
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        🎯 Available Talent Pool
+                    </div>
+                </div>
+                
+                <div class="filter-tabs">
+                    <div class="filter-tab active" onclick="filterFreelancers('all')">All</div>
+                    <div class="filter-tab" onclick="filterFreelancers('available')">Available</div>
+                    <div class="filter-tab" onclick="filterFreelancers('photographers')">Photographers</div>
+                    <div class="filter-tab" onclick="filterFreelancers('coordinators')">Coordinators</div>
+                    <div class="filter-tab" onclick="filterFreelancers('technical')">Technical</div>
+                </div>
+                
+                <div class="freelancer-grid" id="freelancerGrid">
+                    <div class="freelancer-card available" onclick="showFreelancerDetails('Sarah Al-Mahmoud')">
+                        <div class="freelancer-header">
+                            <div class="freelancer-name">Sarah Al-Mahmoud</div>
+                            <div class="freelancer-rating">4.9</div>
+                        </div>
+                        <div class="freelancer-details">
+                            <div class="detail-item">Wedding Photography</div>
+                            <div class="availability-status status-available">Available</div>
+                            <div class="detail-item">Dubai & Abu Dhabi</div>
+                            <div class="detail-item">AED 2,500/day</div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span class="skill-tag">Portrait</span>
+                            <span class="skill-tag">Events</span>
+                            <span class="skill-tag">Drone</span>
+                        </div>
+                    </div>
+                    
+                    <div class="freelancer-card busy" onclick="showFreelancerDetails('Ahmed Hassan')">
+                        <div class="freelancer-header">
+                            <div class="freelancer-name">Ahmed Hassan</div>
+                            <div class="freelancer-rating">4.8</div>
+                        </div>
+                        <div class="freelancer-details">
+                            <div class="detail-item">Event Coordinator</div>
+                            <div class="availability-status status-busy">Busy until May 28</div>
+                            <div class="detail-item">UAE & KSA</div>
+                            <div class="detail-item">AED 800/day</div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span class="skill-tag">Corporate</span>
+                            <span class="skill-tag">VIP</span>
+                            <span class="skill-tag">Arabic/English</span>
+                        </div>
+                    </div>
+                    
+                    <div class="freelancer-card available" onclick="showFreelancerDetails('Maria Santos')">
+                        <div class="freelancer-header">
+                            <div class="freelancer-name">Maria Santos</div>
+                            <div class="freelancer-rating">4.7</div>
+                        </div>
+                        <div class="freelancer-details">
+                            <div class="detail-item">Sound Engineer</div>
+                            <div class="availability-status status-available">Available</div>
+                            <div class="detail-item">Dubai Marina</div>
+                            <div class="detail-item">AED 1,200/day</div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span class="skill-tag">Live Audio</span>
+                            <span class="skill-tag">Mixing</span>
+                            <span class="skill-tag">Equipment</span>
+                        </div>
+                    </div>
+                    
+                    <div class="freelancer-card partial" onclick="showFreelancerDetails('Fatima Al-Zahra')">
+                        <div class="freelancer-header">
+                            <div class="freelancer-name">Fatima Al-Zahra</div>
+                            <div class="freelancer-rating">4.6</div>
+                        </div>
+                        <div class="freelancer-details">
+                            <div class="detail-item">Cultural Performer</div>
+                            <div class="availability-status status-partial">Partial availability</div>
+                            <div class="detail-item">Traditional Arts</div>
+                            <div class="detail-item">AED 1,500/event</div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span class="skill-tag">Traditional</span>
+                            <span class="skill-tag">Dance</span>
+                            <span class="skill-tag">Music</span>
+                        </div>
+                    </div>
+                    
+                    <div class="freelancer-card available" onclick="showFreelancerDetails('John Mitchell')">
+                        <div class="freelancer-header">
+                            <div class="freelancer-name">John Mitchell</div>
+                            <div class="freelancer-rating">4.5</div>
+                        </div>
+                        <div class="freelancer-details">
+                            <div class="detail-item">Lighting Designer</div>
+                            <div class="availability-status status-available">Available</div>
+                            <div class="detail-item">Premium Events</div>
+                            <div class="detail-item">AED 1,800/day</div>
+                        </div>
+                        <div style="margin-top: 8px;">
+                            <span class="skill-tag">LED</span>
+                            <span class="skill-tag">Architectural</span>
+                            <span class="skill-tag">Design</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title">
+                        📅 Current Project Assignments
+                    </div>
+                </div>
+                
+                <div class="project-assignments">
+                    <div class="assignment-item" onclick="showProjectDetails('Emirates NBD Summit')">
+                        <div class="assignment-header">
+                            <div class="assignment-title">Emirates NBD Leadership Summit</div>
+                            <div class="assignment-date">May 25-27</div>
+                        </div>
+                        <div class="assignment-details">
+                            <div>
+                                <strong style="color: #FFD700;">500 attendees</strong><br>
+                                DIFC Conference Center
+                            </div>
+                            <div>
+                                <strong style="color: #4ECDC4;">12 freelancers assigned</strong><br>
+                                95% confirmation rate
+                            </div>
+                        </div>
+                        <div class="assignment-resources">
+                            <div class="resource-chips">
+                                <div class="resource-chip">3 Photographers</div>
+                                <div class="resource-chip">2 Coordinators</div>
+                                <div class="resource-chip">4 Technical</div>
+                                <div class="resource-chip">3 Support</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="assignment-item" onclick="showProjectDetails('Luxury Wedding')">
+                        <div class="assignment-header">
+                            <div class="assignment-title">Luxury Wedding - Emirates Palace</div>
+                            <div class="assignment-date">May 30</div>
+                        </div>
+                        <div class="assignment-details">
+                            <div>
+                                <strong style="color: #FFD700;">300 guests</strong><br>
+                                Emirates Palace Hotel
+                            </div>
+                            <div>
+                                <strong style="color: #4ECDC4;">18 freelancers assigned</strong><br>
+                                100% confirmation rate
+                            </div>
+                        </div>
+                        <div class="assignment-resources">
+                            <div class="resource-chips">
+                                <div class="resource-chip">4 Photographers</div>
+                                <div class="resource-chip">3 Coordinators</div>
+                                <div class="resource-chip">6 Decorators</div>
+                                <div class="resource-chip">5 Service</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="assignment-item" onclick="showProjectDetails('Corporate Gala')">
+                        <div class="assignment-header">
+                            <div class="assignment-title">Aramco Corporate Gala</div>
+                            <div class="assignment-date">June 2</div>
+                        </div>
+                        <div class="assignment-details">
+                            <div>
+                                <strong style="color: #FFD700;">800 attendees</strong><br>
+                                Riyadh Convention Center
+                            </div>
+                            <div>
+                                <strong style="color: #F59E0B;">15 freelancers needed</strong><br>
+                                AI matching in progress
+                            </div>
+                        </div>
+                        <div class="assignment-resources">
+                            <div class="resource-chips">
+                                <div class="resource-chip">5 Photographers</div>
+                                <div class="resource-chip">3 Coordinators</div>
+                                <div class="resource-chip">4 Technical</div>
+                                <div class="resource-chip">3 Cultural</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ai-recommendations">
+            <div class="ai-header">
+                <div class="ai-badge">AI INSIGHTS</div>
+                <div class="ai-title">🧠 Intelligent Resource Recommendations</div>
+            </div>
+            
+            <div class="recommendations-grid">
+                <div class="recommendation-card rec-optimization">
+                    <div class="rec-title">🎯 Optimal Resource Allocation</div>
+                    <div class="rec-description">For Aramco Gala, recommend Sarah Al-Mahmoud (lead photographer), Ahmed Hassan (post-availability), and Maria Santos (sound). This combination historically delivers 28% higher client satisfaction scores.</div>
+                </div>
+                
+                <div class="recommendation-card rec-opportunity">
+                    <div class="rec-title">💰 Revenue Optimization</div>
+                    <div class="rec-description">Cross-training 5 photographers in drone operations could increase average day rate from AED 2,500 to AED 3,200. Investment: AED 15K, ROI within 6 months.</div>
+                </div>
+                
+                <div class="recommendation-card rec-warning">
+                    <div class="rec-title">⚠️ Capacity Alert</div>
+                    <div class="rec-description">June showing 95% utilization in photography category. Recommend recruiting 3 additional photographers or partnering with agencies to prevent quality compromise.</div>
+                </div>
+                
+                <div class="recommendation-card rec-optimization">
+                    <div class="rec-title">📅 Schedule Optimization</div>
+                    <div class="rec-description">Shifting Emirates Palace wedding setup from 8AM to 6AM enables photographer team to cover 2 events same day, increasing revenue by AED 8,500 with zero additional costs.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="capacity-overview">
+            <div class="capacity-header">
+                <h2 style="color: white; margin-bottom: 10px;">📊 Resource Capacity Analysis</h2>
+                <p style="color: rgba(255, 255, 255, 0.8);">Current vs Traditional Management Efficiency</p>
+            </div>
+            
+            <div class="capacity-metrics">
+                <div class="capacity-metric">
+                    <div class="capacity-percentage">85%</div>
+                    <div class="capacity-label">Current Utilization</div>
+                    <div class="capacity-bar">
+                        <div class="capacity-fill" style="width: 85%"></div>
+                    </div>
+                </div>
+                
+                <div class="capacity-metric">
+                    <div class="capacity-percentage">96%</div>
+                    <div class="capacity-label">Match Accuracy</div>
+                    <div class="capacity-bar">
+                        <div class="capacity-fill" style="width: 96%"></div>
+                    </div>
+                </div>
+                
+                <div class="capacity-metric">
+                    <div class="capacity-percentage">92%</div>
+                    <div class="capacity-label">Skill Optimization</div>
+                    <div class="capacity-bar">
+                        <div class="capacity-fill" style="width: 92%"></div>
+                    </div>
+                </div>
+                
+                <div class="capacity-metric">
+                    <div class="capacity-percentage">88%</div>
+                    <div class="capacity-label">Cost Efficiency</div>
+                    <div class="capacity-bar">
+                        <div class="capacity-fill" style="width: 88%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-controls">
+            <button class="demo-btn" onclick="showResourceOptimization()">⚡ AI Resource Matching</button>
+            <button class="demo-btn" onclick="showCapacityPlan()">📅 Capacity Planning</button>
+            <button class="demo-btn" onclick="showPerformanceAnalytics()">📊 Performance Analytics</button>
+        </div>
+    </div>
+
+    <script>
+        function filterFreelancers(category) {
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter freelancers (simplified for demo)
+            const freelancerCards = document.querySelectorAll('.freelancer-card');
+            freelancerCards.forEach(card => {
+                if (category === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    // Simple filtering logic for demo
+                    const isMatch = card.textContent.toLowerCase().includes(category.toLowerCase()) ||
+                                   category === 'available' && card.classList.contains('available') ||
+                                   category === 'photographers' && card.textContent.includes('Photography') ||
+                                   category === 'coordinators' && card.textContent.includes('Coordinator') ||
+                                   category === 'technical' && (card.textContent.includes('Sound') || card.textContent.includes('Lighting'));
+                    
+                    card.style.display = isMatch ? 'block' : 'none';
+                }
+            });
+        }
+        
+        function showFreelancerDetails(name) {
+            const freelancerData = {
+                'Sarah Al-Mahmoud': {
+                    details: `👤 **SARAH AL-MAHMOUD - SENIOR PHOTOGRAPHER**\n\n⭐ **Performance Metrics:**\n• Overall Rating: 4.9/5 (Top 5% performer)\n• Client Satisfaction: 98%\n• Project Completion Rate: 100%\n• Repeat Booking Rate: 85%\n\n📸 **Specializations:**\n• Luxury Wedding Photography\n• Corporate Events & Headshots\n• Drone Photography (Licensed)\n• Portrait & Fashion\n\n💼 **Recent Projects:**\n• Dubai International Film Festival (Lead Photographer)\n• Emirates Palace Wedding Series (12 events)\n• ADNOC Corporate Portraits (500+ executives)\n• UAE National Day Celebrations\n\n💰 **Financial Performance:**\n• Day Rate: AED 2,500\n• Average Project Value: AED 12,000\n• Annual Revenue Generated: AED 185,000\n• Cost per Quality Point: Excellent\n\n📅 **Availability:**\n• Next 30 days: 18 days available\n• Preferred locations: Dubai, Abu Dhabi\n• Weekend premium: +20%\n• Travel willing: GCC region\n\n🎯 **AI Recommendation:**\nPerfect match for high-profile events requiring premium photography. Consistently exceeds client expectations. Recommend for Emirates NBD Summit lead photographer role.`
+                },
+                'Ahmed Hassan': {
+                    details: `👤 **AHMED HASSAN - EVENT COORDINATOR**\n\n⭐ **Performance Metrics:**\n• Overall Rating: 4.8/5\n• Event Success Rate: 96%\n• Client Communication: Outstanding\n• Problem Resolution: Excellent\n\n🎯 **Specializations:**\n• Corporate Event Management\n• VIP Guest Coordination\n• Multi-cultural Events\n• Crisis Management\n\n💼 **Current Assignment:**\n• Busy until May 28 with Sharjah Art Foundation Gala\n• Next available: May 29\n• Has requested advance booking for June projects\n\n📊 **Key Strengths:**\n• Fluent: Arabic, English, Hindi\n• Licensed in UAE & KSA\n• 8 years experience\n• Cultural sensitivity expert\n\n🎯 **AI Recommendation:**\nExcellent for multinational corporate events. Strong relationship management skills. Reserve for Aramco Gala (post-availability).`
+                }
+            };
+            
+            const freelancer = freelancerData[name] || {
+                details: `📋 **FREELANCER PROFILE**\n\nDetailed performance analytics and recommendations would be displayed here for ${name}.`
+            };
+            
+            showModal(`${name} - Freelancer Profile`, freelancer.details);
+        }
+        
+        function showProjectDetails(projectName) {
+            const projectData = {
+                'Emirates NBD Summit': {
+                    details: `🏢 **EMIRATES NBD LEADERSHIP SUMMIT**\n\n📋 **Event Overview:**\n• Date: May 25-27, 2025\n• Venue: DIFC Conference Center\n• Attendees: 500 senior executives\n• Budget: AED 850,000\n• Project Manager: Layla Al-Mansouri\n\n👥 **Resource Allocation:**\n• Total Freelancers: 12\n• Confirmation Rate: 95%\n• Skill Match Score: 94%\n• Cost Optimization: 8% under budget\n\n📊 **Team Breakdown:**\n• Lead Photographer: Sarah Al-Mahmoud (4.9★)\n• Assistant Photographers: 2 specialists\n• Event Coordinators: 2 bilingual\n• Technical Support: 4 AV specialists\n• Guest Services: 3 VIP coordinators\n\n⚡ **AI Optimizations Applied:**\n• Optimal skill-role matching\n• Conflict-free scheduling\n• Cost-effective team composition\n• Backup resource identification\n\n🎯 **Success Probability: 96%**\nBased on team performance history and event complexity analysis.`
+                }
+            };
+            
+            const project = projectData[projectName] || {
+                details: `📋 **PROJECT DETAILS**\n\nComprehensive project information would be displayed here for ${projectName}.`
+            };
+            
+            showModal(`${projectName} - Project Details`, project.details);
+        }
+        
+        function showResourceOptimization() {
+            const optimizationData = `⚡ **AI RESOURCE MATCHING SYSTEM**\n\n🎯 **Intelligent Matching Process:**\n\n**Step 1: Requirement Analysis**\n• Event type, size, and complexity assessment\n• Client preferences and cultural requirements\n• Budget and quality expectations\n• Location and timing constraints\n\n**Step 2: Talent Pool Analysis**\n• Real-time availability scanning\n• Skill-requirement matching\n• Performance history evaluation\n• Cost optimization calculations\n\n**Step 3: Optimal Team Assembly**\n• AI algorithm considers 15+ factors\n• Prevents skill gaps and overlaps\n• Ensures cultural and language compatibility\n• Optimizes travel and logistics costs\n\n📊 **Current Matching Performance:**\n• Accuracy: 96% (vs 75% manual)\n• Time to match: 15 minutes (vs 4 hours)\n• Cost optimization: 12% average savings\n• Client satisfaction: 4.8/5 (vs 4.2/5)\n\n🚀 **Example: Upcoming Aramco Gala**\n• Requirements: 15 professionals, Arabic/English speakers\n• AI analysis time: 8 minutes\n• Top team combination identified\n• Backup options prepared\n• Cost: 14% under manual allocation\n\n🎯 **Benefits:**\n• Zero double-booking incidents\n• 35% faster team assembly\n• 90% reduction in last-minute changes\n• 25% improvement in team chemistry scores`;
+            
+            showModal("⚡ AI Resource Matching System", optimizationData);
+        }
+        
+        function showCapacityPlan() {
+            const capacityData = `📅 **STRATEGIC CAPACITY PLANNING**\n\n📊 **Current Capacity Analysis:**\n\n**May 2025:**\n• Utilization Rate: 85%\n• Available capacity: 37 freelancer-days\n• Peak demand period: Weeks 3-4\n• Bottleneck: Photography (95% utilized)\n\n**June 2025 Forecast:**\n• Predicted utilization: 92%\n• High-demand categories: Photography, Coordination\n• Potential overload: First 2 weeks\n• Revenue opportunity: AED 320K additional\n\n**July 2025 Outlook:**\n• Seasonal peak begins\n• Wedding season surge (+40% demand)\n• Corporate events plateau\n• International projects increase\n\n🎯 **Capacity Optimization Strategies:**\n\n**Immediate Actions (Next 30 days):**\n• Recruit 3 additional photographers\n• Cross-train existing coordinators\n• Establish partnership with 2 agencies\n• Implement surge pricing for peak periods\n\n**Medium-term (90 days):**\n• Develop mobile workforce (Dubai-Abu Dhabi)\n• Invest in equipment pool expansion\n• Create specialist teams for recurring clients\n• Implement dynamic pricing model\n\n**Long-term (6 months):**\n• Regional expansion to cover GCC\n• AI-powered demand forecasting\n• Freelancer development programs\n• Strategic vendor partnerships\n\n💰 **Financial Impact:**\n• Additional revenue potential: AED 2.1M/year\n• Capacity investment required: AED 180K\n• ROI timeline: 4.2 months\n• Risk mitigation value: AED 85K/year`;
+            
+            showModal("📅 Strategic Capacity Planning", capacityData);
+        }
+        
+        function showPerformanceAnalytics() {
+            const analyticsData = `📊 **FREELANCER PERFORMANCE ANALYTICS**\n\n🏆 **Top Performer Analysis:**\n\n**Sarah Al-Mahmoud (Photography)**\n• Rating: 4.9/5 (Industry benchmark: 4.2/5)\n• Revenue generated: AED 185K/year\n• Client retention: 95%\n• Efficiency score: 98%\n\n**Ahmed Hassan (Coordination)**\n• Rating: 4.8/5\n• Event success rate: 96%\n• Problem resolution time: 18 minutes avg\n• Multilingual capability: High value\n\n**Performance Trends:**\n• Overall team rating improved 23% vs last year\n• Client complaints reduced 67%\n• Repeat bookings increased 34%\n• Cost per quality point decreased 15%\n\n📈 **Key Performance Indicators:**\n\n**Quality Metrics:**\n• Average freelancer rating: 4.5/5\n• Client satisfaction: 96%\n• Project success rate: 94%\n• Quality consistency: 89%\n\n**Efficiency Metrics:**\n• Resource utilization: 85% (Target: 80%)\n• Match accuracy: 96%\n• Scheduling conflicts: 5% (Down from 25%)\n• Last-minute cancellations: 2%\n\n**Financial Metrics:**\n• Average day rate: AED 1,450\n• Cost optimization: 12%\n• Revenue per freelancer: AED 89K/year\n• Margin improvement: 8.5%\n\n🎯 **Improvement Opportunities:**\n• Skill development programs (+15% average rates)\n• Performance incentive system\n• Peer mentoring for bottom 20%\n• Specialized certification tracks\n\n⚠️ **Risk Areas:**\n• 15% of freelancers showing performance decline\n• Capacity constraints in premium categories\n• Talent competition from other agencies\n• Seasonal availability fluctuations`;
+            
+            showModal("📊 Performance Analytics", analyticsData);
+        }
+        
+        function showModal(title, content) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 20px;
+                padding: 30px;
+                max-width: 800px;
+                max-height: 80vh;
+                overflow-y: auto;
+                color: white;
+                position: relative;
+            `;
+            
+            modalContent.innerHTML = `
+                <button onclick="this.closest('.modal').remove()" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 20px;
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 24px;
+                    cursor: pointer;
+                ">&times;</button>
+                <h2 style="margin-bottom: 20px; color: #FFD700;">${title}</h2>
+                <div style="white-space: pre-line; line-height: 1.6;">${content}</div>
+            `;
+            
+            modal.className = 'modal';
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        // Animate capacity bars on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const capacityFills = document.querySelectorAll('.capacity-fill');
+                capacityFills.forEach(fill => {
+                    const width = fill.style.width;
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = width;
+                    }, 500);
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

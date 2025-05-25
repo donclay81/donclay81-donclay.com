@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blink Experience - Financial Intelligence Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #22C55E;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #22C55E;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+        }
+        
+        .kpi-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .kpi-title {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+        
+        .kpi-trend {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .trend-up {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22C55E;
+        }
+        
+        .trend-down {
+            background: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+        }
+        
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+        
+        .kpi-subtitle {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .chart-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-btn {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .chart-btn.active,
+        .chart-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            color: #FFD700;
+        }
+        
+        .revenue-chart {
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+        
+        .chart-bar {
+            width: 60px;
+            background: linear-gradient(to top, #FFD700, #FFA500);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            transition: all 0.5s ease;
+            cursor: pointer;
+        }
+        
+        .chart-bar:hover {
+            filter: brightness(1.2);
+            transform: scaleY(1.05);
+        }
+        
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            white-space: nowrap;
+        }
+        
+        .bar-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #FFD700;
+            font-weight: 600;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .sidebar-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .project-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .project-item:last-child {
+            border-bottom: none;
+        }
+        
+        .project-info {
+            flex: 1;
+        }
+        
+        .project-name {
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .project-client {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .project-margin {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .margin-high { color: #22C55E; }
+        .margin-medium { color: #FFD700; }
+        .margin-low { color: #EF4444; }
+        
+        .entity-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .entity-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .entity-flag {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .entity-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .entity-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .entity-metric {
+            text-align: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .entity-metric-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 4px;
+        }
+        
+        .entity-metric-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .alerts-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .alerts-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .alert-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .alerts-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+        
+        .alert-critical {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: #EF4444;
+        }
+        
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: #F59E0B;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3B82F6;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: white;
+        }
+        
+        .alert-description {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .demo-controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .demo-btn {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #1E293B;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .entity-breakdown {
+                grid-template-columns: 1fr;
+            }
+        }
+/* Updated Navigation Menu Styles - Replace previous navigation CSS */
+.nav-menu {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 10px 15px;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: calc(100% - 40px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.nav-menu a:hover {
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.nav-menu a.active {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #1a1a2e;
+    transform: translateY(-2px);
+}
+
+/* Remove hamburger menu - not needed with bottom nav */
+.nav-toggle {
+    display: none;
+}
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+    .nav-menu {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        transform: none;
+        padding: 8px 10px;
+        gap: 5px;
+        max-width: none;
+    }
+    
+    .nav-menu a {
+        font-size: 0.7rem;
+        padding: 6px 8px;
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+/* Alternative: Top Header Navigation (if you prefer top position) */
+.nav-header {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-header .nav-menu {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    max-width: 100%;
+}
+    </style>
+</head>
+<body>
+<!-- Top Header Navigation - Add after <body> tag -->
+<div class="nav-header">
+    <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">🏠 Dashboard</a>
+        <a href="executive-strategy.html" class="nav-link">📊 Strategy</a>
+        <a href="compliance-automation.html" class="nav-link">✅ Compliance</a>
+        <a href="financial-dashboard.html" class="nav-link">💰 Finance</a>
+        <a href="vendor-management.html" class="nav-link">🛒 Procurement</a>
+        <a href="resource-management.html" class="nav-link">👥 HR</a>
+        <a href="project-transformation.html" class="nav-link">📋 Projects</a>
+        <a href="ai-event-planning.html" class="nav-link">🤖 AI</a>
+        <a href="roi-timeline.html" class="nav-link">📈 ROI</a>
+    </nav>
+</div>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>💰 Financial Intelligence Dashboard</h1>
+            <div class="live-indicator">
+                <div class="pulse-dot"></div>
+                Real-time Consolidated View - Last Updated: 14:32 GMT+4
+            </div>
+            <p style="font-size: 1.2rem; opacity: 0.8;">From 8-day month-end close to 2-day real-time insights</p>
+        </div>
+        
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Total Revenue (YTD)</div>
+                    <div class="kpi-trend trend-up">↗ +18%</div>
+                </div>
+                <div class="kpi-value">AED 18.4M</div>
+                <div class="kpi-subtitle">AED 2.8M above target</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Gross Margin</div>
+                    <div class="kpi-trend trend-up">↗ +4.5%</div>
+                </div>
+                <div class="kpi-value">23.8%</div>
+                <div class="kpi-subtitle">Up from 18% last year</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Active Projects</div>
+                    <div class="kpi-trend trend-up">↗ +12</div>
+                </div>
+                <div class="kpi-value">49</div>
+                <div class="kpi-subtitle">Across all entities</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Cash Position</div>
+                    <div class="kpi-trend trend-up">↗ +22%</div>
+                </div>
+                <div class="kpi-value">AED 3.2M</div>
+                <div class="kpi-subtitle">Healthy cash flow</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Outstanding AR</div>
+                    <div class="kpi-trend trend-down">↘ -35%</div>
+                </div>
+                <div class="kpi-value">AED 1.1M</div>
+                <div class="kpi-subtitle">Excellent collection</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div class="chart-title">📈 Revenue Trend Analysis</div>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" onclick="switchChart('monthly')">Monthly</button>
+                        <button class="chart-btn" onclick="switchChart('quarterly')">Quarterly</button>
+                        <button class="chart-btn" onclick="switchChart('entity')">By Entity</button>
+                    </div>
+                </div>
+                
+                <div class="revenue-chart" id="revenueChart">
+                    <div class="chart-bar" style="height: 65%;">
+                        <div class="bar-value">2.1M</div>
+                        <div class="bar-label">Jan</div>
+                    </div>
+                    <div class="chart-bar" style="height: 80%;">
+                        <div class="bar-value">2.5M</div>
+                        <div class="bar-label">Feb</div>
+                    </div>
+                    <div class="chart-bar" style="height: 70%;">
+                        <div class="bar-value">2.2M</div>
+                        <div class="bar-label">Mar</div>
+                    </div>
+                    <div class="chart-bar" style="height: 95%;">
+                        <div class="bar-value">3.0M</div>
+                        <div class="bar-label">Apr</div>
+                    </div>
+                    <div class="chart-bar" style="height: 85%;">
+                        <div class="bar-value">2.7M</div>
+                        <div class="bar-label">May</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <div class="sidebar-title">🎯 Top Performing Projects</div>
+                    
+                    <div class="project-item">
+                        <div class="project-info">
+                            <div class="project-name">Dubai Film Festival Gala</div>
+                            <div class="project-client">DIFF Organization</div>
+                        </div>
+                        <div class="project-margin margin-high">28.5%</div>
+                    </div>
+                    
+                    <div class="project-item">
+                        <div class="project-info">
+                            <div class="project-name">Emirates NBD Summit</div>
+                            <div class="project-client">Emirates NBD</div>
+                        </div>
+                        <div class="project-margin margin-high">26.2%</div>
+                    </div>
+                    
+                    <div class="project-item">
+                        <div class="project-info">
+                            <div class="project-name">Luxury Wedding Series</div>
+                            <div class="project-client">Private Client</div>
+                        </div>
+                        <div class="project-margin margin-medium">22.8%</div>
+                    </div>
+                    
+                    <div class="project-item">
+                        <div class="project-info">
+                            <div class="project-name">Corporate Conference</div>
+                            <div class="project-client">Aramco</div>
+                        </div>
+                        <div class="project-margin margin-medium">21.5%</div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-card">
+                    <div class="sidebar-title">💱 Currency Exposure</div>
+                    
+                    <div class="project-item">
+                        <div class="project-info">
+                            <div class="project-name">AED Exposure</div>
+                            <div class="project-client">UAE Operations</div>
+                        </div>
+                        <div class="project-margin margin-high">65%</div>
+                    </div>
+                    
+                    <div class="project-item">
+                        <div class="project-info">
+                            <div class="project-name">SAR Exposure</div>
+                            <div class="project-client">KSA Operations</div>
+                        </div>
+                        <div class="project-margin margin-medium">25%</div>
+                    </div>
+                    
+                    <div class="project-item">
+                        <div class="project-info">
+                            <div class="project-name">EUR Exposure</div>
+                            <div class="project-client">Hungary Operations</div>
+                        </div>
+                        <div class="project-margin margin-medium">10%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="entity-breakdown">
+            <div class="entity-card">
+                <div class="entity-flag">🇦🇪</div>
+                <div class="entity-name">UAE Operations</div>
+                <div class="entity-metrics">
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">AED 12.0M</div>
+                        <div class="entity-metric-label">Revenue YTD</div>
+                    </div>
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">24.2%</div>
+                        <div class="entity-metric-label">Margin</div>
+                    </div>
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">31</div>
+                        <div class="entity-metric-label">Active Projects</div>
+                    </div>
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">5%</div>
+                        <div class="entity-metric-label">VAT Rate</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="entity-card">
+                <div class="entity-flag">🇸🇦</div>
+                <div class="entity-name">KSA Operations</div>
+                <div class="entity-metrics">
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">SAR 18.0M</div>
+                        <div class="entity-metric-label">Revenue YTD</div>
+                    </div>
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">25.1%</div>
+                        <div class="entity-metric-label">Margin</div>
+                    </div>
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">14</div>
+                        <div class="entity-metric-label">Active Projects</div>
+                    </div>
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">15%</div>
+                        <div class="entity-metric-label">VAT Rate</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="entity-card">
+                <div class="entity-flag">🇭🇺</div>
+                <div class="entity-name">Hungary Operations</div>
+                <div class="entity-metrics">
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">€425K</div>
+                        <div class="entity-metric-label">Revenue YTD</div>
+                    </div>
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">27.8%</div>
+                        <div class="entity-metric-label">Margin</div>
+                    </div>
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">4</div>
+                        <div class="entity-metric-label">Active Projects</div>
+                    </div>
+                    <div class="entity-metric">
+                        <div class="entity-metric-value">27%</div>
+                        <div class="entity-metric-label">VAT Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alerts-section">
+            <div class="alerts-header">
+                <div class="alert-icon">🚨</div>
+                <div class="alerts-title">Financial Intelligence Alerts</div>
+            </div>
+            
+            <div class="alert-item alert-info">
+                <div class="alert-content">
+                    <div class="alert-title">💰 Cash Flow Optimization Opportunity</div>
+                    <div class="alert-description">Early payment discounts available from 3 major vendors. Potential savings: AED 45,000 if paid within 10 days.</div>
+                </div>
+            </div>
+            
+            <div class="alert-item alert-warning">
+                <div class="alert-content">
+                    <div class="alert-title">📊 Project Margin Alert</div>
+                    <div class="alert-description">Marina Corporate Event showing margin compression (18.5% vs 23% target). Recommend cost review meeting with project manager.</div>
+                </div>
+            </div>
+            
+            <div class="alert-item alert-critical">
+                <div class="alert-content">
+                    <div class="alert-title">💱 Currency Risk Exposure</div>
+                    <div class="alert-description">EUR exposure increased 15% this month. Consider hedging strategy for Hungarian operations given volatility forecast.</div>
+                </div>
+            </div>
+            
+            <div class="alert-item alert-info">
+                <div class="alert-content">
+                    <div class="alert-title">🎯 Budget Performance</div>
+                    <div class="alert-description">Q2 revenue 118% of budget. Capacity planning recommended for Q3 to capitalize on demand surge.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-controls">
+            <button class="demo-btn" onclick="showFinancialReport()">📊 Generate Executive Report</button>
+            <button class="demo-btn" onclick="showCashFlowForecast()">💰 Cash Flow Forecast</button>
+            <button class="demo-btn" onclick="showComplianceStatus()">✅ Compliance Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        function switchChart(type) {
+            // Update button states
+            document.querySelectorAll('.chart-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const chart = document.getElementById('revenueChart');
+            
+            const chartData = {
+                monthly: [
+                    { label: 'Jan', value: '2.1M', height: '65%' },
+                    { label: 'Feb', value: '2.5M', height: '80%' },
+                    { label: 'Mar', value: '2.2M', height: '70%' },
+                    { label: 'Apr', value: '3.0M', height: '95%' },
+                    { label: 'May', value: '2.7M', height: '85%' }
+                ],
+                quarterly: [
+                    { label: 'Q1 2024', value: '6.8M', height: '70%' },
+                    { label: 'Q2 2024', value: '8.2M', height: '85%' },
+                    { label: 'Q3 2024', value: '7.9M', height: '80%' },
+                    { label: 'Q4 2024', value: '9.5M', height: '95%' },
+                    { label: 'Q1 2025', value: '8.7M', height: '90%' }
+                ],
+                entity: [
+                    { label: 'UAE', value: '12.0M', height: '95%' },
+                    { label: 'KSA', value: '4.8M', height: '65%' },
+                    { label: 'Hungary', value: '1.6M', height: '35%' }
+                ]
+            };
+            
+            const data = chartData[type];
+            
+            chart.innerHTML = data.map(item => `
+                <div class="chart-bar" style="height: ${item.height};">
+                    <div class="bar-value">${item.value}</div>
+                    <div class="bar-label">${item.label}</div>
+                </div>
+            `).join('');
+            
+            // Animate bars
+            setTimeout(() => {
+                chart.querySelectorAll('.chart-bar').forEach((bar, index) => {
+                    bar.style.opacity = '0';
+                    bar.style.transform = 'scaleY(0)';
+                    setTimeout(() => {
+                        bar.style.transition = 'all 0.5s ease';
+                        bar.style.opacity = '1';
+                        bar.style.transform = 'scaleY(1)';
+                    }, index * 100);
+                });
+            }, 100);
+        }
+        
+        function showFinancialReport() {
+            const reportData = `📊 **EXECUTIVE FINANCIAL REPORT - MAY 2025**\n\n💰 **Performance Highlights:**\n• YTD Revenue: AED 18.4M (+18% vs budget)\n• Gross Margin: 23.8% (Up from 18% last year)\n• Net Profit: AED 4.4M (+25% YoY)\n• Cash Position: AED 3.2M (Strong liquidity)\n\n🌍 **Multi-Entity Performance:**\n• UAE: AED 12.0M revenue (65% of total)\n• KSA: SAR 18.0M revenue (equivalent AED 4.8M)\n• Hungary: €425K revenue (equivalent AED 1.6M)\n\n📈 **Key Metrics:**\n• Active Projects: 49 (Record high)\n• Average Project Margin: 23.8%\n• Client Retention Rate: 87%\n• Outstanding AR: AED 1.1M (30 days average)\n\n🎯 **Strategic Insights:**\n• Premium event segment driving margin expansion\n• Multi-location events showing 35% higher profitability\n• Technology investments paying off (15% efficiency gain)\n• Q3 capacity planning required for demand surge\n\n⚠️ **Risk Factors:**\n• Currency exposure to EUR increased 15%\n• Vendor inflation averaging 8% annually\n• Talent shortage in premium segment\n\n📋 **Recommendations:**\n• Expand premium service capabilities\n• Implement currency hedging strategy\n• Invest in talent acquisition and training\n• Consider regional expansion opportunities`;
+            
+            showModal("📊 Executive Financial Report", reportData);
+        }
+        
+        function showCashFlowForecast() {
+            const forecastData = `💰 **90-DAY CASH FLOW FORECAST**\n\n📅 **Next 30 Days:**\n• Expected Receipts: AED 2.8M\n  - Emirates NBD Summit payment: AED 850K\n  - Dubai Film Festival final: AED 650K\n  - Wedding series installments: AED 420K\n  - KSA corporate events: AED 880K\n\n• Planned Payments: AED 1.9M\n  - Vendor settlements: AED 1.2M\n  - Payroll & benefits: AED 480K\n  - Operating expenses: AED 220K\n\n• **Net Cash Flow: +AED 900K**\n\n📅 **Days 31-60:**\n• Expected Receipts: AED 3.2M\n• Planned Payments: AED 2.1M\n• **Net Cash Flow: +AED 1.1M**\n\n📅 **Days 61-90:**\n• Expected Receipts: AED 2.9M\n• Planned Payments: AED 2.3M\n• **Net Cash Flow: +AED 600K**\n\n📊 **Summary:**\n• Starting Cash: AED 3.2M\n• 90-Day Net Flow: +AED 2.6M\n• Ending Cash Position: AED 5.8M\n\n✅ **Risk Assessment:**\n• Low risk: 95% collection confidence\n• Currency impact: Minimal (natural hedging)\n• Seasonal factors: Considered in forecast\n\n🎯 **Opportunities:**\n• Early payment discounts: AED 45K savings\n• Investment options: AED 2M available for growth\n• Credit facility unutilized: AED 1M backup`;
+            
+            showModal("💰 Cash Flow Forecast", forecastData);
+        }
+        
+        function showComplianceStatus() {
+            const complianceData = `✅ **MULTI-JURISDICTIONAL COMPLIANCE STATUS**\n\n🇦🇪 **UAE Compliance:**\n• VAT Returns: ✅ Filed on time (5% rate)\n• WPS Compliance: ✅ 100% salary transfers\n• Trade License: ✅ Valid until Dec 2025\n• Audit Status: ✅ Clean audit opinion\n• Economic Substance: ✅ Requirements met\n\n🇸🇦 **KSA Compliance:**\n• ZATCA E-Invoicing: ✅ 100% compliant\n• VAT Returns: ✅ Filed on time (15% rate)\n• Zakat Declaration: ✅ Submitted Q1 2025\n• Saudization: ✅ 68% (exceeds 60% requirement)\n• Commercial Registration: ✅ Valid\n\n🇭🇺 **Hungary Compliance:**\n• EU VAT: ✅ Filed on time (27% rate)\n• Corporate Tax: ✅ 9% rate applied correctly\n• GDPR: ✅ Full compliance maintained\n• Local Accounting: ✅ Hungarian standards met\n• Social Contributions: ✅ All payments current\n\n📊 **Compliance Metrics:**\n• Overall Compliance Score: 98.5%\n• Automated Processes: 90%\n• Manual Interventions: 10% (Down from 45%)\n• Penalty Risk: Minimal\n\n💰 **Cost Impact:**\n• Compliance Costs: AED 45K/year\n  (Down from AED 165K with manual processes)\n• External Consultant Savings: AED 120K/year\n• Penalty Avoidance: AED 85K/year\n\n🎯 **D365 Benefits:**\n• Real-time compliance monitoring\n• Automated VAT calculations\n• Multi-currency accuracy: 99.8%\n• Audit trail completeness: 100%\n• Regulatory updates: Automatic`;
+            
+            showModal("✅ Compliance Dashboard", complianceData);
+        }
+        
+        function showModal(title, content) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 20px;
+                padding: 30px;
+                max-width: 800px;
+                max-height: 80vh;
+                overflow-y: auto;
+                color: white;
+                position: relative;
+            `;
+            
+            modalContent.innerHTML = `
+                <button onclick="this.closest('.modal').remove()" style="
+                    position: absolute;
+                    top: 15px;
+                    right: 20px;
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 24px;
+                    cursor: pointer;
+                ">&times;</button>
+                <h2 style="margin-bottom: 20px; color: #FFD700;">${title}</h2>
+                <div style="white-space: pre-line; line-height: 1.6;">${content}</div>
+            `;
+            
+            modal.className = 'modal';
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        // Animate KPI cards on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const kpiCards = document.querySelectorAll('.kpi-card');
+            kpiCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(30px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 150);
+            });
+        });
+    </script>
+</body>
+</html>
